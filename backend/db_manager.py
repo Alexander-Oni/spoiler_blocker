@@ -47,10 +47,6 @@ class DatabaseManager:
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка подключения: {e}")
-      print(Fore.YELLOW + "💡 Проверьте:")
-      print("   - Запущен ли PostgreSQL сервер")
-      print("   - Правильный ли пароль")
-      print("   - Существует ли база данных 'spoiler_blocker'")
       return False
     
   def create_tables(self):
@@ -327,7 +323,7 @@ class DatabaseManager:
     except Error as e:
       if self.connection:
         self.connection.rollback()
-        
+
       print(Fore.RED + f"❌ Ошибка логирования: {e}")
       return False
     
