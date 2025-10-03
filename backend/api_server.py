@@ -117,6 +117,7 @@ def get_stats():
   API ЭНДПОИНТ: Получить статистику блокировок
   Используется во всплывающем окне расширения
   """
+
   try:
     # Получаем user_id из параметров запроса
     user_id = request.args.get('user_id', 1, type=int)
@@ -149,3 +150,16 @@ def get_stats():
       'success': False, 
       'error': str(e)
     }), 500
+  
+@app.route('/api/health', methods=['GET'])
+def health_check():
+  """
+  API ЭНДПОИНТ: Проверка здоровья сервера
+  Используется для проверки доступности сервера
+  """
+
+  return jsonify({
+    'status': 'healthy',
+    'service': 'SpoilerBlocker API',
+    'database': 'connected' if db.connection else 'disconnected'
+  })
