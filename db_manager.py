@@ -118,3 +118,19 @@ class DatabaseManager:
       except Error as e:
           print(Fore.RED + f"❌ Ошибка создания таблиц: {e}")
           return False
+      
+    def add_user(self, username, email, subscription_type='free'):
+        """
+        Добавляет нового пользователя в систему
+        """
+        try:
+            cursor = self.connection.cursor()
+            query = "INSERT INTO Users (username, email, subscription_type) VALUES (%s, %s, %s)"
+            cursor.execute(query, (username, email, subscription_type))
+            self.connection.commit()
+            print(Fore.GREEN + f"✅ Пользователь '{username}' добавлен!")
+            return True
+        
+        except Error as e:
+            print(Fore.RED + f"❌ Ошибка добавления пользователя: {e}")
+            return False
