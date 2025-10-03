@@ -17,7 +17,15 @@ class DatabaseManager:
     self.database = database
     self.user = user
     self.password = password
-    self.connect()
+    self.is_connected = self.connect()
+
+  def _ensure_connection(self):
+    """Проверяет активность соединения с БД"""
+    if not self.is_connected or self.connection is None or self.connection.closed:
+      print(Fore.RED + "❌ Нет активного подключения к базе данных")
+      return False
+    
+    return True
 
   def connect(self):
     """
@@ -50,6 +58,9 @@ class DatabaseManager:
     Создает все необходимые таблицы в базе данных
     Выполняет 5 SQL-запросов для создания таблиц
     """
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
       
@@ -128,6 +139,9 @@ class DatabaseManager:
     """
     Добавляет нового пользователя в систему
     """
+    if not self._ensure_connection():
+      return False
+
     try:
       with self.connection.cursor() as cursor:
         query = "INSERT INTO Users (username, email, subscription_type) VALUES (%s, %s, %s)"
@@ -144,6 +158,10 @@ class DatabaseManager:
     """
     Получает список всех пользователей из базы данных
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         cursor.execute("SELECT user_id, username, email, subscription_type FROM Users")
@@ -157,6 +175,10 @@ class DatabaseManager:
     """
     Добавляет новую категорию контента (фильмы, сериалы и т.д.)
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = "INSERT INTO Categories (category_name, description) VALUES (%s, %s)"
@@ -173,6 +195,10 @@ class DatabaseManager:
     """
     Получает все активные категории из базы данных
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         cursor.execute("SELECT category_id, category_name, description FROM Categories WHERE is_active = TRUE")
@@ -186,6 +212,10 @@ class DatabaseManager:
     """
     Добавляет новое ключевое слово для блокировки
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = "INSERT INTO Keywords (keyword_text, category_id, severity_level) VALUES (%s, %s, %s)"
@@ -203,6 +233,10 @@ class DatabaseManager:
     Получает все ключевые слова с информацией о категориях
     Использует SQL JOIN для объединения данных из двух таблиц
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = """
@@ -221,6 +255,10 @@ class DatabaseManager:
     """
     Ищет ключевые слова по тексту (поиск с частичным совпадением)
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
@@ -236,6 +274,10 @@ class DatabaseManager:
     Удаляет ключевое слово из системы
     Сначала удаляет связанные данные из других таблиц
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         # Удаляем связи с пользователями
@@ -257,6 +299,10 @@ class DatabaseManager:
     """
     Записывает информацию о блокировке контента в лог
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
@@ -272,6 +318,10 @@ class DatabaseManager:
     """
     Получает статистику блокировок для конкретного пользователя
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = """
@@ -301,6 +351,10 @@ class DatabaseManager:
     """
     Получает самые популярные ключевые слова по количеству блокировок
     """
+
+    if not self._ensure_connection():
+      return False
+    
     try:
       with self.connection.cursor() as cursor:
         query = """
