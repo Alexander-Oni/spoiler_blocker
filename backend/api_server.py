@@ -43,6 +43,7 @@ def get_keywords():
   API ЭНДПОИНТ: Получить все ключевые слова для расширения
   Вызывается при загрузке каждой страницы в браузере
   """
+
   try:
     logger.info("Получен запрос на получение ключевых слов")
     
@@ -70,6 +71,41 @@ def get_keywords():
   
   except Exception as e:
     logger.error(f"❌ Ошибка в /api/keywords: {e}")
+    return jsonify({
+      'success': False, 
+      'error': str(e)
+    }), 500
+  
+@app.route('/api/block', methods=['POST'])
+def log_block():
+  """
+  API ЭНДПОИНТ: Записать факт блокировки спойлера
+  Вызывается когда расширение блокирует спойлер на странице
+  """
+
+  try:
+    # Получаем JSON данные из запроса
+    data = request.json
+    logger.info(f"Получены данные блокировки: {data}")
+    
+    # Логируем блокировку в базу данных
+    success = db.log_blocked_content(
+      user_id = data.get('user_id', 1),  # По умолчанию user_id=1
+      keyword_id = data.get('keyword_id'),
+      url = data.get('url', ''),
+      blocked_content = data.get('content', '')[:500]  # Ограничиваем длину
+    )
+    
+    if success:
+      logger.info("✅ Блокировка записана в базу данных")
+      return jsonify({'success': True})
+    
+    else:
+      logger.error("❌ Ошибка записи блокировки в БД")
+      return jsonify({'success': False, 'error': 'Database error'})
+  
+  except Exception as e:
+    logger.error(f"❌ Ошибка в /api/block: {e}")
     return jsonify({
       'success': False, 
       'error': str(e)
