@@ -24,3 +24,16 @@ db = DatabaseManager(
   password='postgres'  
 )
 
+@app.route('/')
+def home():
+  """Главная страница API сервера"""
+  return jsonify({
+    'message': 'SpoilerBlocker API Server',
+    'version': '0.01',
+    'endpoints': {
+      '/api/keywords': 'GET - получить ключевые слова',
+      '/api/block': 'POST - записать блокировку', 
+      '/api/stats': 'GET - получить статистику'
+    }
+  })
+
