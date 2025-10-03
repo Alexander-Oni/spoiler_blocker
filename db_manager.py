@@ -23,6 +23,9 @@ class DatabaseManager:
     """
     Устанавливает соединение с базой данных PostgreSQL
     """
+    if self.connection:
+      self.connection.close()
+
     try:
       self.connection = psycopg2.connect(
           host=self.host,
