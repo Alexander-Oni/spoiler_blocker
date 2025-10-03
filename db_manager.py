@@ -48,74 +48,74 @@ class DatabaseManager:
     Выполняет 5 SQL-запросов для создания таблиц
     """
     try:
-      cursor = self.connection.cursor()
+      with self.connection.cursor() as cursor:
       
-      # Список SQL-запросов для создания таблиц
-      tables = [
-        # Таблица пользователей
-        """
-        CREATE TABLE IF NOT EXISTS Users (
-            user_id SERIAL PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            email VARCHAR(100) UNIQUE NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            subscription_type VARCHAR(20) DEFAULT 'free'
-        )
-        """,
+        # Список SQL-запросов для создания таблиц
+        tables = [
+          # Таблица пользователей
+          """
+          CREATE TABLE IF NOT EXISTS Users (
+              user_id SERIAL PRIMARY KEY,
+              username VARCHAR(50) UNIQUE NOT NULL,
+              email VARCHAR(100) UNIQUE NOT NULL,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              subscription_type VARCHAR(20) DEFAULT 'free'
+          )
+          """,
+          
+          # Таблица категорий контента
+          """
+          CREATE TABLE IF NOT EXISTS Categories (
+              category_id SERIAL PRIMARY KEY,
+              category_name VARCHAR(100) NOT NULL,
+              description TEXT,
+              is_active BOOLEAN DEFAULT TRUE
+          )
+          """,
+          
+          # Таблица ключевых слов для блокировки
+          """
+          CREATE TABLE IF NOT EXISTS Keywords (
+              keyword_id SERIAL PRIMARY KEY,
+              keyword_text VARCHAR(200) NOT NULL,
+              category_id INTEGER REFERENCES Categories(category_id),
+              severity_level VARCHAR(20) DEFAULT 'medium',
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+          """,
+          
+          # Таблица связей пользователей и ключевых слов
+          """
+          CREATE TABLE IF NOT EXISTS User_Filters (
+              filter_id SERIAL PRIMARY KEY,
+              user_id INTEGER REFERENCES Users(user_id),
+              keyword_id INTEGER REFERENCES Keywords(keyword_id),
+              is_active BOOLEAN DEFAULT TRUE,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+          """,
+          
+          # Таблица для логирования блокировок
+          """
+          CREATE TABLE IF NOT EXISTS Blocked_Content_Log (
+              log_id SERIAL PRIMARY KEY,
+              user_id INTEGER REFERENCES Users(user_id),
+              keyword_id INTEGER REFERENCES Keywords(keyword_id),
+              url VARCHAR(500),
+              blocked_content TEXT,
+              blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+          """
+        ]
         
-        # Таблица категорий контента
-        """
-        CREATE TABLE IF NOT EXISTS Categories (
-            category_id SERIAL PRIMARY KEY,
-            category_name VARCHAR(100) NOT NULL,
-            description TEXT,
-            is_active BOOLEAN DEFAULT TRUE
-        )
-        """,
+        # Выполняем каждый SQL-запрос
+        for table_query in tables:
+          cursor.execute(table_query)
         
-        # Таблица ключевых слов для блокировки
-        """
-        CREATE TABLE IF NOT EXISTS Keywords (
-            keyword_id SERIAL PRIMARY KEY,
-            keyword_text VARCHAR(200) NOT NULL,
-            category_id INTEGER REFERENCES Categories(category_id),
-            severity_level VARCHAR(20) DEFAULT 'medium',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """,
-        
-        # Таблица связей пользователей и ключевых слов
-        """
-        CREATE TABLE IF NOT EXISTS User_Filters (
-            filter_id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES Users(user_id),
-            keyword_id INTEGER REFERENCES Keywords(keyword_id),
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """,
-        
-        # Таблица для логирования блокировок
-        """
-        CREATE TABLE IF NOT EXISTS Blocked_Content_Log (
-            log_id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES Users(user_id),
-            keyword_id INTEGER REFERENCES Keywords(keyword_id),
-            url VARCHAR(500),
-            blocked_content TEXT,
-            blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """
-      ]
-        
-      # Выполняем каждый SQL-запрос
-      for table_query in tables:
-        cursor.execute(table_query)
-      
-      # Сохраняем изменения в базе данных
-      self.connection.commit()
-      print(Fore.GREEN + "✅ Все таблицы созданы успешно!")
-      return True
+        # Сохраняем изменения в базе данных
+        self.connection.commit()
+        print(Fore.GREEN + "✅ Все таблицы созданы успешно!")
+        return True
         
     except Error as e:
       print(Fore.RED + f"❌ Ошибка создания таблиц: {e}")
@@ -126,12 +126,12 @@ class DatabaseManager:
     Добавляет нового пользователя в систему
     """
     try:
-      cursor = self.connection.cursor()
-      query = "INSERT INTO Users (username, email, subscription_type) VALUES (%s, %s, %s)"
-      cursor.execute(query, (username, email, subscription_type))
-      self.connection.commit()
-      print(Fore.GREEN + f"✅ Пользователь '{username}' добавлен!")
-      return True
+      with self.connection.cursor() as cursor:
+        query = "INSERT INTO Users (username, email, subscription_type) VALUES (%s, %s, %s)"
+        cursor.execute(query, (username, email, subscription_type))
+        self.connection.commit()
+        print(Fore.GREEN + f"✅ Пользователь '{username}' добавлен!")
+        return True
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка добавления пользователя: {e}")
@@ -142,9 +142,9 @@ class DatabaseManager:
     Получает список всех пользователей из базы данных
     """
     try:
-      cursor = self.connection.cursor()
-      cursor.execute("SELECT user_id, username, email, subscription_type FROM Users")
-      return cursor.fetchall()
+      with self.connection.cursor() as cursor:
+        cursor.execute("SELECT user_id, username, email, subscription_type FROM Users")
+        return cursor.fetchall()
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения пользователей: {e}")
@@ -155,12 +155,12 @@ class DatabaseManager:
     Добавляет новую категорию контента (фильмы, сериалы и т.д.)
     """
     try:
-      cursor = self.connection.cursor()
-      query = "INSERT INTO Categories (category_name, description) VALUES (%s, %s)"
-      cursor.execute(query, (category_name, description))
-      self.connection.commit()
-      print(Fore.GREEN + f"✅ Категория '{category_name}' добавлена!")
-      return True
+      with self.connection.cursor() as cursor:
+        query = "INSERT INTO Categories (category_name, description) VALUES (%s, %s)"
+        cursor.execute(query, (category_name, description))
+        self.connection.commit()
+        print(Fore.GREEN + f"✅ Категория '{category_name}' добавлена!")
+        return True
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка добавления категории: {e}")
@@ -171,9 +171,9 @@ class DatabaseManager:
     Получает все активные категории из базы данных
     """
     try:
-      cursor = self.connection.cursor()
-      cursor.execute("SELECT category_id, category_name, description FROM Categories WHERE is_active = TRUE")
-      return cursor.fetchall()
+      with self.connection.cursor() as cursor:
+        cursor.execute("SELECT category_id, category_name, description FROM Categories WHERE is_active = TRUE")
+        return cursor.fetchall()
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения категорий: {e}")
@@ -184,12 +184,12 @@ class DatabaseManager:
     Добавляет новое ключевое слово для блокировки
     """
     try:
-      cursor = self.connection.cursor()
-      query = "INSERT INTO Keywords (keyword_text, category_id, severity_level) VALUES (%s, %s, %s)"
-      cursor.execute(query, (keyword_text, category_id, severity_level))
-      self.connection.commit()
-      print(Fore.GREEN + f"✅ Ключевое слово '{keyword_text}' добавлено!")
-      return True
+      with self.connection.cursor() as cursor:
+        query = "INSERT INTO Keywords (keyword_text, category_id, severity_level) VALUES (%s, %s, %s)"
+        cursor.execute(query, (keyword_text, category_id, severity_level))
+        self.connection.commit()
+        print(Fore.GREEN + f"✅ Ключевое слово '{keyword_text}' добавлено!")
+        return True
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка добавления ключевого слова: {e}")
@@ -201,14 +201,14 @@ class DatabaseManager:
     Использует SQL JOIN для объединения данных из двух таблиц
     """
     try:
-      cursor = self.connection.cursor()
-      query = """
-      SELECT k.keyword_id, k.keyword_text, c.category_name, k.severity_level 
-      FROM Keywords k 
-      JOIN Categories c ON k.category_id = c.category_id
-      """
-      cursor.execute(query)
-      return cursor.fetchall()
+      with self.connection.cursor() as cursor:
+        query = """
+        SELECT k.keyword_id, k.keyword_text, c.category_name, k.severity_level 
+        FROM Keywords k 
+        JOIN Categories c ON k.category_id = c.category_id
+        """
+        cursor.execute(query)
+        return cursor.fetchall()
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения ключевых слов: {e}")
@@ -219,10 +219,10 @@ class DatabaseManager:
     Ищет ключевые слова по тексту (поиск с частичным совпадением)
     """
     try:
-      cursor = self.connection.cursor()
-      query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
-      cursor.execute(query, (f'%{search_term}%',))
-      return cursor.fetchall()
+      with self.connection.cursor() as cursor:
+        query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
+        cursor.execute(query, (f'%{search_term}%',))
+        return cursor.fetchall()
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка поиска: {e}")
@@ -234,17 +234,17 @@ class DatabaseManager:
     Сначала удаляет связанные данные из других таблиц
     """
     try:
-      cursor = self.connection.cursor()
-      # Удаляем связи с пользователями
-      cursor.execute("DELETE FROM User_Filters WHERE keyword_id = %s", (keyword_id,))
-      # Удаляем записи из лога
-      cursor.execute("DELETE FROM Blocked_Content_Log WHERE keyword_id = %s", (keyword_id,))
-      # Удаляем само ключевое слово
-      cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
-      
-      self.connection.commit()
-      print(Fore.GREEN + "✅ Ключевое слово удалено!")
-      return True
+      with self.connection.cursor() as cursor:
+        # Удаляем связи с пользователями
+        cursor.execute("DELETE FROM User_Filters WHERE keyword_id = %s", (keyword_id,))
+        # Удаляем записи из лога
+        cursor.execute("DELETE FROM Blocked_Content_Log WHERE keyword_id = %s", (keyword_id,))
+        # Удаляем само ключевое слово
+        cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
+        
+        self.connection.commit()
+        print(Fore.GREEN + "✅ Ключевое слово удалено!")
+        return True
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка удаления: {e}")
@@ -255,11 +255,11 @@ class DatabaseManager:
     Записывает информацию о блокировке контента в лог
     """
     try:
-      cursor = self.connection.cursor()
-      query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
-      cursor.execute(query, (user_id, keyword_id, url, blocked_content))
-      self.connection.commit()
-      return True
+      with self.connection.cursor() as cursor:
+        query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (user_id, keyword_id, url, blocked_content))
+        self.connection.commit()
+        return True
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка логирования: {e}")
@@ -270,25 +270,25 @@ class DatabaseManager:
     Получает статистику блокировок для конкретного пользователя
     """
     try:
-      cursor = self.connection.cursor()
-      query = """
-      SELECT 
-        COUNT(*) as total_blocks,
-        COUNT(DISTINCT keyword_id) as unique_keywords_blocked,
-        MAX(blocked_at) as last_blocked
-      FROM Blocked_Content_Log 
-      WHERE user_id = %s
-      """
-      cursor.execute(query, (user_id,))
-      result = cursor.fetchone()
-      
-      if result:
-        return {
-          'total_blocks': result[0],
-          'unique_keywords_blocked': result[1],
-          'last_blocked': result[2]
-        }
-      return None
+      with self.connection.cursor() as cursor:
+        query = """
+        SELECT 
+          COUNT(*) as total_blocks,
+          COUNT(DISTINCT keyword_id) as unique_keywords_blocked,
+          MAX(blocked_at) as last_blocked
+        FROM Blocked_Content_Log 
+        WHERE user_id = %s
+        """
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchone()
+        
+        if result:
+          return {
+            'total_blocks': result[0],
+            'unique_keywords_blocked': result[1],
+            'last_blocked': result[2]
+          }
+        return None
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения статистики: {e}")
@@ -299,25 +299,25 @@ class DatabaseManager:
     Получает самые популярные ключевые слова по количеству блокировок
     """
     try:
-      cursor = self.connection.cursor()
-      query = """
-        SELECT k.keyword_text, COUNT(b.keyword_id) as block_count
-        FROM Keywords k
-        LEFT JOIN Blocked_Content_Log b ON k.keyword_id = b.keyword_id
-        GROUP BY k.keyword_id, k.keyword_text
-        ORDER BY block_count DESC
-        LIMIT %s
-      """
-      cursor.execute(query, (limit,))
-      results = cursor.fetchall()
-      
-      popular_keywords = []
-      for row in results:
-        popular_keywords.append({
-          'keyword_text': row[0],
-          'block_count': row[1]
-        })
-      return popular_keywords
+      with self.connection.cursor() as cursor:
+        query = """
+          SELECT k.keyword_text, COUNT(b.keyword_id) as block_count
+          FROM Keywords k
+          LEFT JOIN Blocked_Content_Log b ON k.keyword_id = b.keyword_id
+          GROUP BY k.keyword_id, k.keyword_text
+          ORDER BY block_count DESC
+          LIMIT %s
+        """
+        cursor.execute(query, (limit,))
+        results = cursor.fetchall()
+        
+        popular_keywords = []
+        for row in results:
+          popular_keywords.append({
+            'keyword_text': row[0],
+            'block_count': row[1]
+          })
+        return popular_keywords
     
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения популярных слов: {e}")
