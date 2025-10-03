@@ -110,3 +110,42 @@ def log_block():
       'success': False, 
       'error': str(e)
     }), 500
+  
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+  """
+  API ЭНДПОИНТ: Получить статистику блокировок
+  Используется во всплывающем окне расширения
+  """
+  try:
+    # Получаем user_id из параметров запроса
+    user_id = request.args.get('user_id', 1, type=int)
+    logger.info(f"Запрос статистики для пользователя {user_id}")
+    
+    # Получаем статистику из базы данных
+    stats = db.get_user_stats(user_id)
+    
+    if stats:
+      logger.info(f" Отправлена статистика: {stats}")
+      return jsonify({
+        'success': True, 
+        'stats': stats
+      })
+    
+    else:
+      # Если статистики нет, возвращаем нули
+      return jsonify({
+        'success': True,
+        'stats': {
+          'total_blocks': 0,
+          'unique_keywords_blocked': 0,
+          'last_blocked': None
+        }
+      })
+  
+  except Exception as e:
+    logger.error(f"❌ Ошибка в /api/stats: {e}")
+    return jsonify({
+      'success': False, 
+      'error': str(e)
+    }), 500
