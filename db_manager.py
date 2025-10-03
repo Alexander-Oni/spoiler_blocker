@@ -132,6 +132,9 @@ class DatabaseManager:
         return True
         
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
+
       print(Fore.RED + f"❌ Ошибка создания таблиц: {e}")
       return False
       
@@ -151,6 +154,9 @@ class DatabaseManager:
         return True
     
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
+
       print(Fore.RED + f"❌ Ошибка добавления пользователя: {e}")
       return False
     
@@ -160,7 +166,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return []
     
     try:
       with self.connection.cursor() as cursor:
@@ -188,6 +194,9 @@ class DatabaseManager:
         return True
     
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
+
       print(Fore.RED + f"❌ Ошибка добавления категории: {e}")
       return False
   
@@ -197,7 +206,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return []
     
     try:
       with self.connection.cursor() as cursor:
@@ -225,6 +234,9 @@ class DatabaseManager:
         return True
     
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
+
       print(Fore.RED + f"❌ Ошибка добавления ключевого слова: {e}")
       return False
       
@@ -235,7 +247,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return []
     
     try:
       with self.connection.cursor() as cursor:
@@ -257,7 +269,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return []
     
     try:
       with self.connection.cursor() as cursor:
@@ -292,6 +304,8 @@ class DatabaseManager:
         return True
     
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
       print(Fore.RED + f"❌ Ошибка удаления: {e}")
       return False
     
@@ -311,6 +325,9 @@ class DatabaseManager:
         return True
     
     except Error as e:
+      if self.connection:
+        self.connection.rollback()
+        
       print(Fore.RED + f"❌ Ошибка логирования: {e}")
       return False
     
@@ -320,7 +337,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return None
     
     try:
       with self.connection.cursor() as cursor:
@@ -353,7 +370,7 @@ class DatabaseManager:
     """
 
     if not self._ensure_connection():
-      return False
+      return []
     
     try:
       with self.connection.cursor() as cursor:
