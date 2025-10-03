@@ -249,3 +249,47 @@ def delete_keyword(self, keyword_id):
   except Error as e:
     print(Fore.RED + f"❌ Ошибка удаления: {e}")
     return False
+  
+def log_blocked_content(self, user_id, keyword_id, url, blocked_content):
+  """
+  Записывает информацию о блокировке контента в лог
+  """
+  try:
+    cursor = self.connection.cursor()
+    query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
+    cursor.execute(query, (user_id, keyword_id, url, blocked_content))
+    self.connection.commit()
+    return True
+  
+  except Error as e:
+    print(Fore.RED + f"❌ Ошибка логирования: {e}")
+    return False
+  
+def get_user_stats(self, user_id):
+  """
+  Получает статистику блокировок для конкретного пользователя
+  """
+  try:
+    cursor = self.connection.cursor()
+    query = """
+    SELECT 
+      COUNT(*) as total_blocks,
+      COUNT(DISTINCT keyword_id) as unique_keywords_blocked,
+      MAX(blocked_at) as last_blocked
+    FROM Blocked_Content_Log 
+    WHERE user_id = %s
+    """
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchone()
+    
+    if result:
+      return {
+        'total_blocks': result[0],
+        'unique_keywords_blocked': result[1],
+        'last_blocked': result[2]
+      }
+    return None
+  
+  except Error as e:
+    print(Fore.RED + f"❌ Ошибка получения статистики: {e}")
+    return None
