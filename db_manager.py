@@ -214,82 +214,119 @@ class DatabaseManager:
       print(Fore.RED + f"❌ Ошибка получения ключевых слов: {e}")
       return []
     
-def search_keywords(self, search_term):
-  """
-  Ищет ключевые слова по тексту (поиск с частичным совпадением)
-  """
-  try:
-    cursor = self.connection.cursor()
-    query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
-    cursor.execute(query, (f'%{search_term}%',))
-    return cursor.fetchall()
-  
-  except Error as e:
-    print(Fore.RED + f"❌ Ошибка поиска: {e}")
-    return []
-    
-def delete_keyword(self, keyword_id):
-  """
-  Удаляет ключевое слово из системы
-  Сначала удаляет связанные данные из других таблиц
-  """
-  try:
-    cursor = self.connection.cursor()
-    # Удаляем связи с пользователями
-    cursor.execute("DELETE FROM User_Filters WHERE keyword_id = %s", (keyword_id,))
-    # Удаляем записи из лога
-    cursor.execute("DELETE FROM Blocked_Content_Log WHERE keyword_id = %s", (keyword_id,))
-    # Удаляем само ключевое слово
-    cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
-    
-    self.connection.commit()
-    print(Fore.GREEN + "✅ Ключевое слово удалено!")
-    return True
-  
-  except Error as e:
-    print(Fore.RED + f"❌ Ошибка удаления: {e}")
-    return False
-  
-def log_blocked_content(self, user_id, keyword_id, url, blocked_content):
-  """
-  Записывает информацию о блокировке контента в лог
-  """
-  try:
-    cursor = self.connection.cursor()
-    query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query, (user_id, keyword_id, url, blocked_content))
-    self.connection.commit()
-    return True
-  
-  except Error as e:
-    print(Fore.RED + f"❌ Ошибка логирования: {e}")
-    return False
-  
-def get_user_stats(self, user_id):
-  """
-  Получает статистику блокировок для конкретного пользователя
-  """
-  try:
-    cursor = self.connection.cursor()
-    query = """
-    SELECT 
-      COUNT(*) as total_blocks,
-      COUNT(DISTINCT keyword_id) as unique_keywords_blocked,
-      MAX(blocked_at) as last_blocked
-    FROM Blocked_Content_Log 
-    WHERE user_id = %s
+  def search_keywords(self, search_term):
     """
-    cursor.execute(query, (user_id,))
-    result = cursor.fetchone()
+    Ищет ключевые слова по тексту (поиск с частичным совпадением)
+    """
+    try:
+      cursor = self.connection.cursor()
+      query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
+      cursor.execute(query, (f'%{search_term}%',))
+      return cursor.fetchall()
     
-    if result:
-      return {
-        'total_blocks': result[0],
-        'unique_keywords_blocked': result[1],
-        'last_blocked': result[2]
-      }
-    return None
-  
-  except Error as e:
-    print(Fore.RED + f"❌ Ошибка получения статистики: {e}")
-    return None
+    except Error as e:
+      print(Fore.RED + f"❌ Ошибка поиска: {e}")
+      return []
+      
+  def delete_keyword(self, keyword_id):
+    """
+    Удаляет ключевое слово из системы
+    Сначала удаляет связанные данные из других таблиц
+    """
+    try:
+      cursor = self.connection.cursor()
+      # Удаляем связи с пользователями
+      cursor.execute("DELETE FROM User_Filters WHERE keyword_id = %s", (keyword_id,))
+      # Удаляем записи из лога
+      cursor.execute("DELETE FROM Blocked_Content_Log WHERE keyword_id = %s", (keyword_id,))
+      # Удаляем само ключевое слово
+      cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
+      
+      self.connection.commit()
+      print(Fore.GREEN + "✅ Ключевое слово удалено!")
+      return True
+    
+    except Error as e:
+      print(Fore.RED + f"❌ Ошибка удаления: {e}")
+      return False
+    
+  def log_blocked_content(self, user_id, keyword_id, url, blocked_content):
+    """
+    Записывает информацию о блокировке контента в лог
+    """
+    try:
+      cursor = self.connection.cursor()
+      query = "INSERT INTO Blocked_Content_Log (user_id, keyword_id, url, blocked_content) VALUES (%s, %s, %s, %s)"
+      cursor.execute(query, (user_id, keyword_id, url, blocked_content))
+      self.connection.commit()
+      return True
+    
+    except Error as e:
+      print(Fore.RED + f"❌ Ошибка логирования: {e}")
+      return False
+    
+  def get_user_stats(self, user_id):
+    """
+    Получает статистику блокировок для конкретного пользователя
+    """
+    try:
+      cursor = self.connection.cursor()
+      query = """
+      SELECT 
+        COUNT(*) as total_blocks,
+        COUNT(DISTINCT keyword_id) as unique_keywords_blocked,
+        MAX(blocked_at) as last_blocked
+      FROM Blocked_Content_Log 
+      WHERE user_id = %s
+      """
+      cursor.execute(query, (user_id,))
+      result = cursor.fetchone()
+      
+      if result:
+        return {
+          'total_blocks': result[0],
+          'unique_keywords_blocked': result[1],
+          'last_blocked': result[2]
+        }
+      return None
+    
+    except Error as e:
+      print(Fore.RED + f"❌ Ошибка получения статистики: {e}")
+      return None
+    
+  def get_popular_keywords(self, limit=10):
+    """
+    Получает самые популярные ключевые слова по количеству блокировок
+    """
+    try:
+      cursor = self.connection.cursor()
+      query = """
+        SELECT k.keyword_text, COUNT(b.keyword_id) as block_count
+        FROM Keywords k
+        LEFT JOIN Blocked_Content_Log b ON k.keyword_id = b.keyword_id
+        GROUP BY k.keyword_id, k.keyword_text
+        ORDER BY block_count DESC
+        LIMIT %s
+      """
+      cursor.execute(query, (limit,))
+      results = cursor.fetchall()
+      
+      popular_keywords = []
+      for row in results:
+        popular_keywords.append({
+          'keyword_text': row[0],
+          'block_count': row[1]
+        })
+      return popular_keywords
+    
+    except Error as e:
+      print(Fore.RED + f"❌ Ошибка получения популярных слов: {e}")
+      return []
+    
+  def close_connection(self):
+    """
+    Закрывает соединение с базой данных
+    """
+    if self.connection:
+      self.connection.close()
+      print(Fore.BLUE + "🔌 Соединение с базой данных закрыто")
