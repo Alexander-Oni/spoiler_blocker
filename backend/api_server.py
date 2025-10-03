@@ -37,3 +37,40 @@ def home():
     }
   })
 
+@app.route('/api/keywords', methods=['GET'])
+def get_keywords():
+  """
+  API ЭНДПОИНТ: Получить все ключевые слова для расширения
+  Вызывается при загрузке каждой страницы в браузере
+  """
+  try:
+    logger.info("Получен запрос на получение ключевых слов")
+    
+    # Получаем ключевые слова из базы данных
+    keywords_data = db.get_all_keywords()
+    
+    # Преобразуем в формат JSON для JavaScript
+    keywords_list = []
+    for keyword in keywords_data:
+        keyword_id, keyword_text, category_name, severity_level = keyword
+        keywords_list.append({
+          'id': keyword_id,
+          'text': keyword_text,
+          'category': category_name,
+          'severity': severity_level
+        })
+    
+    logger.info(f"Отправлено {len(keywords_list)} ключевых слов")
+    
+    return jsonify({
+      'success': True,
+      'keywords': keywords_list,
+      'count': len(keywords_list)
+    })
+  
+  except Exception as e:
+    logger.error(f"❌ Ошибка в /api/keywords: {e}")
+    return jsonify({
+      'success': False, 
+      'error': str(e)
+    }), 500
