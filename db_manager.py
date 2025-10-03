@@ -213,3 +213,39 @@ class DatabaseManager:
     except Error as e:
       print(Fore.RED + f"❌ Ошибка получения ключевых слов: {e}")
       return []
+    
+def search_keywords(self, search_term):
+  """
+  Ищет ключевые слова по тексту (поиск с частичным совпадением)
+  """
+  try:
+    cursor = self.connection.cursor()
+    query = "SELECT keyword_id, keyword_text FROM Keywords WHERE keyword_text ILIKE %s"
+    cursor.execute(query, (f'%{search_term}%',))
+    return cursor.fetchall()
+  
+  except Error as e:
+    print(Fore.RED + f"❌ Ошибка поиска: {e}")
+    return []
+    
+def delete_keyword(self, keyword_id):
+  """
+  Удаляет ключевое слово из системы
+  Сначала удаляет связанные данные из других таблиц
+  """
+  try:
+    cursor = self.connection.cursor()
+    # Удаляем связи с пользователями
+    cursor.execute("DELETE FROM User_Filters WHERE keyword_id = %s", (keyword_id,))
+    # Удаляем записи из лога
+    cursor.execute("DELETE FROM Blocked_Content_Log WHERE keyword_id = %s", (keyword_id,))
+    # Удаляем само ключевое слово
+    cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
+    
+    self.connection.commit()
+    print(Fore.GREEN + "✅ Ключевое слово удалено!")
+    return True
+  
+  except Error as e:
+    print(Fore.RED + f"❌ Ошибка удаления: {e}")
+    return False
