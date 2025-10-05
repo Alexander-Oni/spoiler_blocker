@@ -70,7 +70,7 @@ def get_keywords():
     })
   
   except Exception as e:
-    logger.error(f"❌ Ошибка в /api/keywords: {e}")
+    logger.error(f"Ошибка в /api/keywords: {e}")
     return jsonify({
       'success': False, 
       'error': str(e)
@@ -97,15 +97,15 @@ def log_block():
     )
     
     if success:
-      logger.info("✅ Блокировка записана в базу данных")
+      logger.info("Блокировка записана в базу данных")
       return jsonify({'success': True})
     
     else:
-      logger.error("❌ Ошибка записи блокировки в БД")
+      logger.error("Ошибка записи блокировки в БД")
       return jsonify({'success': False, 'error': 'Database error'})
   
   except Exception as e:
-    logger.error(f"❌ Ошибка в /api/block: {e}")
+    logger.error(f"Ошибка в /api/block: {e}")
     return jsonify({
       'success': False, 
       'error': str(e)
@@ -127,7 +127,7 @@ def get_stats():
     stats = db.get_user_stats(user_id)
     
     if stats:
-      logger.info(f" Отправлена статистика: {stats}")
+      logger.info(f"Отправлена статистика: {stats}")
       return jsonify({
         'success': True, 
         'stats': stats
@@ -145,7 +145,7 @@ def get_stats():
       })
   
   except Exception as e:
-    logger.error(f"❌ Ошибка в /api/stats: {e}")
+    logger.error(f"Ошибка в /api/stats: {e}")
     return jsonify({
       'success': False, 
       'error': str(e)
@@ -165,14 +165,14 @@ def health_check():
   })
 
 if __name__ == '__main__':
-  print("🚀 Запуск SpoilerShield API сервера...")
-  print("📍 Адрес: http://localhost:5000")
-  print("📚 Доступные эндпоинты:")
-  print("   GET  /api/keywords - ключевые слова для блокировки")
-  print("   POST /api/block    - запись блокировки в лог") 
-  print("   GET  /api/stats    - статистика блокировок")
-  print("   GET  /api/health   - проверка здоровья сервера")
-  print("\n⚡ Сервер запущен. Для остановки нажмите Ctrl+C")
+  print("Запуск SpoilerShield API сервера...")
+  print("Адрес: http://localhost:5000")
+  print("Доступные эндпоинты:")
+  print("GET  /api/keywords - ключевые слова для блокировки")
+  print("POST /api/block    - запись блокировки в лог") 
+  print("GET  /api/stats    - статистика блокировок")
+  print("GET  /api/health   - проверка здоровья сервера")
+  print("\nСервер запущен. Для остановки нажмите Ctrl+C")
   
   # Запускаем Flask сервер
   app.run(

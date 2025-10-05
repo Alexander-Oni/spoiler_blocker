@@ -35,7 +35,7 @@ class UserInterface:
     Ожидает нажатия клавиши Enter для продолжения
     """
 
-    input(Fore.YELLOW + "\n Нажмите Enter для продолжения...")
+    input(Fore.YELLOW + "\nНажмите Enter для продолжения...")
 
   def main_menu(self):
     """
@@ -54,7 +54,7 @@ class UserInterface:
       print()
       
       # Получаем выбор пользователя
-      choice = input(Fore.GREEN + " Выберите действие (0-5): ")
+      choice = input(Fore.GREEN + "Выберите действие (0-5): ")
       
       # Обрабатываем выбор
       if choice == "1":
@@ -70,11 +70,11 @@ class UserInterface:
         self.statistics_menu()
 
       elif choice == "0":
-        print(Fore.YELLOW + " До свидания!")
+        print(Fore.YELLOW + "До свидания!")
         break
 
       else:
-        print(Fore.RED + " Неверный выбор! Попробуйте снова.")
+        print(Fore.RED + "Неверный выбор! Попробуйте снова.")
         self.wait_for_enter()
 
   def users_menu(self):
@@ -90,7 +90,7 @@ class UserInterface:
       print(Fore.WHITE + "3.  Назад в главное меню")
       print()
       
-      choice = input(Fore.GREEN + " Выберите действие (1-3): ")
+      choice = input(Fore.GREEN + "Выберите действие (1-3): ")
       
       if choice == "1":
         self.add_user()
@@ -102,7 +102,7 @@ class UserInterface:
         break
 
       else:
-        print(Fore.RED + " Неверный выбор!")
+        print(Fore.RED + "Неверный выбор!")
         self.wait_for_enter()
   
   def add_user(self):
@@ -112,12 +112,12 @@ class UserInterface:
 
     self.print_header("ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ")
     
-    print(Fore.YELLOW + " Введите данные нового пользователя:")
-    username = input(" Имя пользователя: ")
-    email = input(" Email: ")
+    print(Fore.YELLOW + "Введите данные нового пользователя:")
+    username = input("Имя пользователя: ")
+    email = input("Email: ")
     
     # Выбор типа подписки
-    print("\n Выберите тип подписки:")
+    print("\nВыберите тип подписки:")
     print("1.  Бесплатная")
     print("2.  Премиум")
     sub_choice = input("Выбор (1-2): ")
@@ -129,7 +129,7 @@ class UserInterface:
       self.db.add_user(username, email, subscription_type)
 
     else:
-      print(Fore.RED + " Все поля должны быть заполнены!")
+      print(Fore.RED + "Все поля должны быть заполнены!")
     
     self.wait_for_enter()
   
@@ -142,7 +142,7 @@ class UserInterface:
     
     users = self.db.get_all_users()
     if users:
-      print(Fore.GREEN + f" Найдено пользователей: {len(users)}")
+      print(Fore.GREEN + f"Найдено пользователей: {len(users)}")
       print()
       print(Fore.CYAN + "ID  | Имя пользователя | Email              | Подписка")
       print(Fore.CYAN + "-" * 55)
@@ -150,11 +150,11 @@ class UserInterface:
       # Выводим каждого пользователя в формате таблицы
       for user in users:
         user_id, username, email, subscription = user
-        sub_icon = "💎" if subscription == "premium" else "🆓"
+        sub_icon = "PREM" if subscription == "premium" else "FREE"
         print(f"{user_id:3} | {username:15} | {email:18} | {sub_icon} {subscription}")
 
     else:
-      print(Fore.YELLOW + "📭 Пользователи не найдены")
+      print(Fore.YELLOW + "Пользователи не найдены")
     
     self.wait_for_enter()
 
@@ -171,7 +171,7 @@ class UserInterface:
       print(Fore.WHITE + "3.  Назад в главное меню")
       print()
       
-      choice = input(Fore.GREEN + " Выберите действие (1-3): ")
+      choice = input(Fore.GREEN + "Выберите действие (1-3): ")
       
       if choice == "1":
         self.add_category()
@@ -183,7 +183,7 @@ class UserInterface:
         break
 
       else:
-        print(Fore.RED + " Неверный выбор!")
+        print(Fore.RED + "Неверный выбор!")
         self.wait_for_enter()
   
   def add_category(self):
@@ -193,15 +193,15 @@ class UserInterface:
 
     self.print_header("ДОБАВЛЕНИЕ КАТЕГОРИИ")
     
-    print(Fore.YELLOW + " Введите данные новой категории:")
-    category_name = input(" Название категории: ")
-    description = input(" Описание: ")
+    print(Fore.YELLOW + "Введите данные новой категории:")
+    category_name = input("Название категории: ")
+    description = input("Описание: ")
     
     if category_name:
       self.db.add_category(category_name, description)
 
     else:
-      print(Fore.RED + " Название категории обязательно!")
+      print(Fore.RED + "Название категории обязательно!")
     
     self.wait_for_enter()
   
@@ -214,7 +214,7 @@ class UserInterface:
     
     categories = self.db.get_all_categories()
     if categories:
-      print(Fore.GREEN + f" Найдено категорий: {len(categories)}")
+      print(Fore.GREEN + f"Найдено категорий: {len(categories)}")
       print()
 
       for category in categories:
@@ -222,7 +222,7 @@ class UserInterface:
         print(f"   {category_id}. {category_name} - {description}")
 
     else:
-      print(Fore.YELLOW + " Категории не найдены")
+      print(Fore.YELLOW + "Категории не найдены")
     
     self.wait_for_enter()
 
@@ -241,7 +241,7 @@ class UserInterface:
       print(Fore.WHITE + "5.  Назад в главное меню")
       print()
       
-      choice = input(Fore.GREEN + " Выберите действие (1-5): ")
+      choice = input(Fore.GREEN + "Выберите действие (1-5): ")
       
       if choice == "1":
         self.add_keyword()
@@ -259,7 +259,7 @@ class UserInterface:
         break
 
       else:
-        print(Fore.RED + " Неверный выбор!")
+        print(Fore.RED + "Неверный выбор!")
         self.wait_for_enter()
     
   def add_keyword(self):
@@ -272,11 +272,11 @@ class UserInterface:
     # Сначала показываем доступные категории
     categories = self.db.get_all_categories()
     if not categories:
-      print(Fore.RED + " Сначала добавьте категории!")
+      print(Fore.RED + "Сначала добавьте категории!")
       self.wait_for_enter()
       return
     
-    print(Fore.YELLOW + " Доступные категории:")
+    print(Fore.YELLOW + "Доступные категории:")
     for category in categories:
       category_id, category_name, description = category
       print(f"   {category_id}. {category_name}")
@@ -284,14 +284,14 @@ class UserInterface:
     
     try:
       # Получаем данные от пользователя
-      category_id = int(input(" Выберите ID категории: "))
-      keyword_text = input(" Ключевое слово/фраза: ")
+      category_id = int(input("Выберите ID категории: "))
+      keyword_text = input("Ключевое слово/фраза: ")
       
       # Выбор уровня серьезности
       print("\n Уровень серьезности:")
-      print("1. 🔴 Высокий (критические спойлеры)")
-      print("2. 🟡 Средний (важные детали сюжета)") 
-      print("3. 🟢 Низкий (незначительные спойлеры)")
+      print("1. RED Высокий (критические спойлеры)")
+      print("2. YELLOW Средний (важные детали сюжета)") 
+      print("3. GREEN Низкий (незначительные спойлеры)")
       severity_choice = input("Выбор (1-3): ")
       
       # Преобразуем выбор в текстовое значение
@@ -303,10 +303,10 @@ class UserInterface:
         self.db.add_keyword(keyword_text, category_id, severity_level)
 
       else:
-        print(Fore.RED + " Все поля должны быть заполнены!")
+        print(Fore.RED + "Все поля должны быть заполнены!")
 
     except ValueError:
-      print(Fore.RED + " ID категории должен быть числом!")
+      print(Fore.RED + "ID категории должен быть числом!")
     
     self.wait_for_enter()
   
@@ -319,16 +319,16 @@ class UserInterface:
     
     keywords = self.db.get_all_keywords()
     if keywords:
-      print(Fore.GREEN + f" Найдено ключевых слов: {len(keywords)}")
+      print(Fore.GREEN + f"Найдено ключевых слов: {len(keywords)}")
       print()
       for keyword in keywords:
         keyword_id, keyword_text, category_name, severity_level = keyword
         # Выбираем emoji в зависимости от уровня серьезности
-        severity_icon = "🔴" if severity_level == "high" else "🟡" if severity_level == "medium" else "🟢"
+        severity_icon = "RED" if severity_level == "high" else "YELLOW" if severity_level == "medium" else "GREEN"
         print(f"   {keyword_id}. {keyword_text} ({category_name}) {severity_icon}")
 
     else:
-      print(Fore.YELLOW + "📭 Ключевые слова не найдены")
+      print(Fore.YELLOW + "Ключевые слова не найдены")
     
     self.wait_for_enter()
   
@@ -339,22 +339,22 @@ class UserInterface:
 
     self.print_header("ПОИСК КЛЮЧЕВЫХ СЛОВ")
     
-    search_term = input(" Введите текст для поиска: ")
+    search_term = input("Введите текст для поиска: ")
     if search_term:
       results = self.db.search_keywords(search_term)
 
       if results:
-        print(Fore.GREEN + f" Найдено результатов: {len(results)}")
+        print(Fore.GREEN + f"Найдено результатов: {len(results)}")
         print()
 
         for keyword_id, keyword_text in results:
           print(f"   {keyword_id}. {keyword_text}")
 
       else:
-        print(Fore.YELLOW + " Ничего не найдено")
+        print(Fore.YELLOW + "Ничего не найдено")
 
     else:
-      print(Fore.RED + " Введите текст для поиска!")
+      print(Fore.RED + "Введите текст для поиска!")
     
     self.wait_for_enter()
   
@@ -367,28 +367,28 @@ class UserInterface:
     
     keywords = self.db.get_all_keywords()
     if not keywords:
-      print(Fore.YELLOW + " Нет ключевых слов для удаления")
+      print(Fore.YELLOW + "Нет ключевых слов для удаления")
       self.wait_for_enter()
       return
     
-    print(Fore.YELLOW + " Доступные ключевые слова:")
+    print(Fore.YELLOW + "Доступные ключевые слова:")
     for keyword in keywords:
       keyword_id, keyword_text, category_name, severity_level = keyword
       print(f"   {keyword_id}. {keyword_text} ({category_name})")
     print()
     
     try:
-      keyword_id = int(input("  Введите ID ключевого слова для удаления: "))
-      confirm = input(" Вы уверены? (y/N): ")
+      keyword_id = int(input("Введите ID ключевого слова для удаления: "))
+      confirm = input("Вы уверены? (y/N): ")
 
       if confirm.lower() == 'y':
           self.db.delete_keyword(keyword_id)
 
       else:
-          print(Fore.YELLOW + " Удаление отменено")
+          print(Fore.YELLOW + "Удаление отменено")
 
     except ValueError:
-      print(Fore.RED + " ID должен быть числом!")
+      print(Fore.RED + "ID должен быть числом!")
     
     self.wait_for_enter()
 
@@ -406,7 +406,7 @@ class UserInterface:
       print(Fore.WHITE + "4.  Назад в главное меню")
       print()
       
-      choice = input(Fore.GREEN + " Выберите действие (1-4): ")
+      choice = input(Fore.GREEN + "Выберите действие (1-4): ")
       
       if choice == "1":
         self.show_general_stats()
@@ -421,7 +421,7 @@ class UserInterface:
         break
 
       else:
-        print(Fore.RED + " Неверный выбор!")
+        print(Fore.RED + "Неверный выбор!")
         self.wait_for_enter()
 
   def show_general_stats(self):
@@ -436,11 +436,11 @@ class UserInterface:
     categories = self.db.get_all_categories()
     keywords = self.db.get_all_keywords()
     
-    print(Fore.GREEN + " Общая статистика системы:")
+    print(Fore.GREEN + "Общая статистика системы:")
     print()
-    print(f" Пользователей: {len(users)}")
-    print(f" Категорий: {len(categories)}")
-    print(f" Ключевых слов: {len(keywords)}")
+    print(f"Пользователей: {len(users)}")
+    print(f"Категорий: {len(categories)}")
+    print(f"Ключевых слов: {len(keywords)}")
     print()  
     
     self.wait_for_enter()
@@ -453,22 +453,22 @@ class UserInterface:
     self.print_header("ПОПУЛЯРНЫЕ КЛЮЧЕВЫЕ СЛОВА")
     
     try:
-      limit = int(input(" Сколько ключевых слов показать? (по умолчанию 10): ") or "10")
+      limit = int(input("Сколько ключевых слов показать? (по умолчанию 10): ") or "10")
       popular_keywords = self.db.get_popular_keywords(limit)
       
       if popular_keywords:
         print()
-        print(Fore.GREEN + f" Топ-{len(popular_keywords)} популярных ключевых слов:")
+        print(Fore.GREEN + f"Топ-{len(popular_keywords)} популярных ключевых слов:")
         print()
 
         for i, item in enumerate(popular_keywords, 1):
           print(f"{i:2}. {item['keyword_text']} - {item['block_count']} блокировок")
 
       else:
-        print(Fore.YELLOW + " Нет данных о блокировках")
+        print(Fore.YELLOW + "Нет данных о блокировках")
 
     except ValueError:
-      print(Fore.RED + " Введите число!")
+      print(Fore.RED + "Введите число!")
     
     self.wait_for_enter()
 
@@ -481,31 +481,31 @@ class UserInterface:
     
     users = self.db.get_all_users()
     if not users:
-      print(Fore.YELLOW + " Нет пользователей в системе")
+      print(Fore.YELLOW + "Нет пользователей в системе")
       self.wait_for_enter()
       return
     
-    print(Fore.YELLOW + " Доступные пользователи:")
+    print(Fore.YELLOW + "Доступные пользователи:")
     for user in users:
       user_id, username, email, subscription = user
       print(f"   {user_id}. {username} ({email})")
     print()
     
     try:
-      user_id = int(input(" Введите ID пользователя: "))
+      user_id = int(input("Введите ID пользователя: "))
       stats = self.db.get_user_stats(user_id)
       
       if stats:
         print()
-        print(Fore.GREEN + f" Статистика пользователя ID {user_id}:")
-        print(f"    Всего блокировок: {stats['total_blocks']}")
-        print(f"    Уникальных слов: {stats['unique_keywords_blocked']}")
-        print(f"    Последняя блокировка: {stats['last_blocked'] or 'никогда'}")
+        print(Fore.GREEN + f"Статистика пользователя ID {user_id}:")
+        print(f"Всего блокировок: {stats['total_blocks']}")
+        print(f"Уникальных слов: {stats['unique_keywords_blocked']}")
+        print(f"Последняя блокировка: {stats['last_blocked'] or 'никогда'}")
 
       else:
-        print(Fore.YELLOW + f" Нет статистики для пользователя ID {user_id}")
+        print(Fore.YELLOW + f"Нет статистики для пользователя ID {user_id}")
 
     except ValueError:
-      print(Fore.RED + " ID должен быть числом!")
+      print(Fore.RED + "ID должен быть числом!")
     
     self.wait_for_enter()

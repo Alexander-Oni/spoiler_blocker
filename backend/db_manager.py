@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2 import Error
 from colorama import Fore, Style, init
 
+
 # Инициализация библиотеки для цветного вывода
 init(autoreset=True)
 
@@ -22,7 +23,7 @@ class DatabaseManager:
   def _ensure_connection(self):
     """Проверяет активность соединения с БД"""
     if not self.is_connected or self.connection is None or self.connection.closed:
-      print(Fore.RED + "❌ Нет активного подключения к базе данных")
+      print(Fore.RED + "Нет активного подключения к базе данных")
       return False
     
     return True
@@ -42,11 +43,11 @@ class DatabaseManager:
           password=self.password,
           port=5432
       )
-      print(Fore.GREEN + "✅ Успешное подключение к PostgreSQL")
+      print(Fore.GREEN + "Успешное подключение к PostgreSQL")
       return True
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка подключения: {e}")
+      print(Fore.RED + f"Ошибка подключения: {e}")
       return False
     
   def create_tables(self):
@@ -124,14 +125,14 @@ class DatabaseManager:
         
         # Сохраняем изменения в базе данных
         self.connection.commit()
-        print(Fore.GREEN + "✅ Все таблицы созданы успешно!")
+        print(Fore.GREEN + "Все таблицы созданы успешно!")
         return True
         
     except Error as e:
       if self.connection:
         self.connection.rollback()
 
-      print(Fore.RED + f"❌ Ошибка создания таблиц: {e}")
+      print(Fore.RED + f"Ошибка создания таблиц: {e}")
       return False
       
   def add_user(self, username, email, subscription_type='free'):
@@ -146,14 +147,14 @@ class DatabaseManager:
         query = "INSERT INTO Users (username, email, subscription_type) VALUES (%s, %s, %s)"
         cursor.execute(query, (username, email, subscription_type))
         self.connection.commit()
-        print(Fore.GREEN + f"✅ Пользователь '{username}' добавлен!")
+        print(Fore.GREEN + f"Пользователь '{username}' добавлен!")
         return True
     
     except Error as e:
       if self.connection:
         self.connection.rollback()
 
-      print(Fore.RED + f"❌ Ошибка добавления пользователя: {e}")
+      print(Fore.RED + f"Ошибка добавления пользователя: {e}")
       return False
     
   def get_all_users(self):
@@ -170,7 +171,7 @@ class DatabaseManager:
         return cursor.fetchall()
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка получения пользователей: {e}")
+      print(Fore.RED + f"Ошибка получения пользователей: {e}")
       return []
     
   def add_category(self, category_name, description):
@@ -186,14 +187,14 @@ class DatabaseManager:
         query = "INSERT INTO Categories (category_name, description) VALUES (%s, %s)"
         cursor.execute(query, (category_name, description))
         self.connection.commit()
-        print(Fore.GREEN + f"✅ Категория '{category_name}' добавлена!")
+        print(Fore.GREEN + f"Категория '{category_name}' добавлена!")
         return True
     
     except Error as e:
       if self.connection:
         self.connection.rollback()
 
-      print(Fore.RED + f"❌ Ошибка добавления категории: {e}")
+      print(Fore.RED + f"Ошибка добавления категории: {e}")
       return False
   
   def get_all_categories(self):
@@ -210,7 +211,7 @@ class DatabaseManager:
         return cursor.fetchall()
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка получения категорий: {e}")
+      print(Fore.RED + f"Ошибка получения категорий: {e}")
       return []
         
   def add_keyword(self, keyword_text, category_id, severity_level='medium'):
@@ -226,14 +227,14 @@ class DatabaseManager:
         query = "INSERT INTO Keywords (keyword_text, category_id, severity_level) VALUES (%s, %s, %s)"
         cursor.execute(query, (keyword_text, category_id, severity_level))
         self.connection.commit()
-        print(Fore.GREEN + f"✅ Ключевое слово '{keyword_text}' добавлено!")
+        print(Fore.GREEN + f"Ключевое слово '{keyword_text}' добавлено!")
         return True
     
     except Error as e:
       if self.connection:
         self.connection.rollback()
 
-      print(Fore.RED + f"❌ Ошибка добавления ключевого слова: {e}")
+      print(Fore.RED + f"Ошибка добавления ключевого слова: {e}")
       return False
       
   def get_all_keywords(self):
@@ -256,7 +257,7 @@ class DatabaseManager:
         return cursor.fetchall()
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка получения ключевых слов: {e}")
+      print(Fore.RED + f"Ошибка получения ключевых слов: {e}")
       return []
     
   def search_keywords(self, search_term):
@@ -274,7 +275,7 @@ class DatabaseManager:
         return cursor.fetchall()
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка поиска: {e}")
+      print(Fore.RED + f"Ошибка поиска: {e}")
       return []
       
   def delete_keyword(self, keyword_id):
@@ -296,13 +297,13 @@ class DatabaseManager:
         cursor.execute("DELETE FROM Keywords WHERE keyword_id = %s", (keyword_id,))
         
         self.connection.commit()
-        print(Fore.GREEN + "✅ Ключевое слово удалено!")
+        print(Fore.GREEN + "Ключевое слово удалено!")
         return True
     
     except Error as e:
       if self.connection:
         self.connection.rollback()
-      print(Fore.RED + f"❌ Ошибка удаления: {e}")
+      print(Fore.RED + f"Ошибка удаления: {e}")
       return False
     
   def log_blocked_content(self, user_id, keyword_id, url, blocked_content):
@@ -324,7 +325,7 @@ class DatabaseManager:
       if self.connection:
         self.connection.rollback()
 
-      print(Fore.RED + f"❌ Ошибка логирования: {e}")
+      print(Fore.RED + f"Ошибка логирования: {e}")
       return False
     
   def get_user_stats(self, user_id):
@@ -357,7 +358,7 @@ class DatabaseManager:
         return None
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка получения статистики: {e}")
+      print(Fore.RED + f"Ошибка получения статистики: {e}")
       return None
     
   def get_popular_keywords(self, limit=10):
@@ -390,7 +391,7 @@ class DatabaseManager:
         return popular_keywords
     
     except Error as e:
-      print(Fore.RED + f"❌ Ошибка получения популярных слов: {e}")
+      print(Fore.RED + f"Ошибка получения популярных слов: {e}")
       return []
     
   def close_connection(self):
@@ -399,4 +400,4 @@ class DatabaseManager:
     """
     if self.connection:
       self.connection.close()
-      print(Fore.BLUE + "🔌 Соединение с базой данных закрыто")
+      print(Fore.BLUE + "Соединение с базой данных закрыто")
