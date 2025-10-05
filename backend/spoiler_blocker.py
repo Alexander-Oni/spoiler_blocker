@@ -33,6 +33,15 @@ def main():
   print(Fore.YELLOW + "         Система блокировки спойлеров v0.01")
   print(Fore.CYAN + "=" * 50)
   print()
+
+  # Запрашиваем параметры подключения у пользователя
+  host = input("Хост (localhost): ") or "localhost"
+  database = input("База данных (spoiler_blocker): ") or "spoiler_blocker"
+  user = input("Пользователь (postgres): ") or "postgres"
+  password = input("Пароль: ") or "postgres"
+
+  print()
+  print(Fore.YELLOW + "Подключаемся к базе данных...")
     
 # Точка входа в программу
 if __name__ == "__main__":
