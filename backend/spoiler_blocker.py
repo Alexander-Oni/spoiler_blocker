@@ -67,6 +67,20 @@ def main():
     # Создаем и запускаем пользовательский интерфейс
     ui = UserInterface(db_manager)
     ui.main_menu()
+
+  except KeyboardInterrupt:
+    print(Fore.YELLOW + "\n\nПрограмма прервана пользователем")
+
+  except Exception as e:
+    print(Fore.RED + f"\nКритическая ошибка: {e}")
+
+  finally:
+    if 'db_manager' in locals():
+      db_manager.close_connection()
+    
+    print(Fore.CYAN + "\n" + "=" * 50)
+    print(Fore.YELLOW + "Спасибо за использование SpoilerBlocker!")
+    print(Fore.CYAN + "=" * 50)
     
 # Точка входа в программу
 if __name__ == "__main__":
