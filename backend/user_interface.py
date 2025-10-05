@@ -395,3 +395,121 @@ class UserInterface:
       print(Fore.RED + " ID должен быть числом!")
     
     self.wait_for_enter()
+
+  def statistics_menu(self):
+    """
+    Меню для просмотра статистики системы
+    """
+
+    while True:
+      self.print_header("СТАТИСТИКА СИСТЕМЫ")
+      
+      print(Fore.WHITE + "1.  Общая статистика")
+      print(Fore.WHITE + "2.  Популярные ключевые слова")
+      print(Fore.WHITE + "3.  Статистика по пользователю")
+      print(Fore.WHITE + "4.  Назад в главное меню")
+      print()
+      
+      choice = input(Fore.GREEN + " Выберите действие (1-4): ")
+      
+      if choice == "1":
+        self.show_general_stats()
+
+      elif choice == "2":
+        self.show_popular_keywords()
+
+      elif choice == "3":
+        self.show_user_stats()
+
+      elif choice == "4":
+        break
+
+      else:
+        print(Fore.RED + " Неверный выбор!")
+        self.wait_for_enter()
+
+  def show_general_stats(self):
+    """
+    Показывает общую статистику системы
+    """
+
+    self.print_header("ОБЩАЯ СТАТИСТИКА")
+    
+    # Получаем все данные для статистики
+    users = self.db.get_all_users()
+    categories = self.db.get_all_categories()
+    keywords = self.db.get_all_keywords()
+    
+    print(Fore.GREEN + " Общая статистика системы:")
+    print()
+    print(f" Пользователей: {len(users)}")
+    print(f" Категорий: {len(categories)}")
+    print(f" Ключевых слов: {len(keywords)}")
+    print()  
+    
+    self.wait_for_enter()
+
+  def show_popular_keywords(self):
+    """
+    Показывает самые популярные ключевые слова
+    """
+
+    self.print_header("ПОПУЛЯРНЫЕ КЛЮЧЕВЫЕ СЛОВА")
+    
+    try:
+      limit = int(input(" Сколько ключевых слов показать? (по умолчанию 10): ") or "10")
+      popular_keywords = self.db.get_popular_keywords(limit)
+      
+      if popular_keywords:
+        print()
+        print(Fore.GREEN + f" Топ-{len(popular_keywords)} популярных ключевых слов:")
+        print()
+
+        for i, item in enumerate(popular_keywords, 1):
+          print(f"{i:2}. {item['keyword_text']} - {item['block_count']} блокировок")
+
+      else:
+        print(Fore.YELLOW + " Нет данных о блокировках")
+
+    except ValueError:
+      print(Fore.RED + " Введите число!")
+    
+    self.wait_for_enter()
+
+  def show_user_stats(self):
+    """
+    Показывает статистику для конкретного пользователя
+    """
+
+    self.print_header("СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ")
+    
+    users = self.db.get_all_users()
+    if not users:
+      print(Fore.YELLOW + " Нет пользователей в системе")
+      self.wait_for_enter()
+      return
+    
+    print(Fore.YELLOW + " Доступные пользователи:")
+    for user in users:
+      user_id, username, email, subscription = user
+      print(f"   {user_id}. {username} ({email})")
+    print()
+    
+    try:
+      user_id = int(input(" Введите ID пользователя: "))
+      stats = self.db.get_user_stats(user_id)
+      
+      if stats:
+        print()
+        print(Fore.GREEN + f" Статистика пользователя ID {user_id}:")
+        print(f"    Всего блокировок: {stats['total_blocks']}")
+        print(f"    Уникальных слов: {stats['unique_keywords_blocked']}")
+        print(f"    Последняя блокировка: {stats['last_blocked'] or 'никогда'}")
+
+      else:
+        print(Fore.YELLOW + f" Нет статистики для пользователя ID {user_id}")
+
+    except ValueError:
+      print(Fore.RED + " ID должен быть числом!")
+    
+    self.wait_for_enter()
