@@ -165,7 +165,7 @@ def health_check():
   })
 
 if __name__ == '__main__':
-  print("Запуск SpoilerShield API сервера...")
+  print("Запуск SpoilerBLocker API сервера...")
   print("Адрес: http://localhost:5000")
   print("Доступные эндпоинты:")
   print("GET  /api/keywords - ключевые слова для блокировки")
