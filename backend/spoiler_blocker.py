@@ -42,6 +42,31 @@ def main():
 
   print()
   print(Fore.YELLOW + "Подключаемся к базе данных...")
+
+  try:
+    # Создаем менеджер базы данных
+    db_manager = DatabaseManager(host, database, user, password)
+    
+    # Проверяем подключение
+    if not db_manager.connect():
+      print(Fore.RED + "Не удалось подключиться к базе данных!")
+      print(Fore.YELLOW + "Решение проблем:")
+      print("1. Убедитесь, что PostgreSQL запущен")
+      print("2. Проверьте правильность пароля")
+      print("3. Создайте базу данных 'spoiler_blocker'")
+      sys.exit(1)
+    
+    # Создаем таблицы в базе данных
+    print(Fore.YELLOW + "Проверяем структуру базы данных...")
+    db_manager.create_tables()
+    
+    # Система готова к работе
+    print(Fore.GREEN + "Система готова к работе!")
+    print()
+    
+    # Создаем и запускаем пользовательский интерфейс
+    ui = UserInterface(db_manager)
+    ui.main_menu()
     
 # Точка входа в программу
 if __name__ == "__main__":
