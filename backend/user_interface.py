@@ -50,7 +50,6 @@ class UserInterface:
       print(Fore.WHITE + "2.  Управление категориями")
       print(Fore.WHITE + "3.  Управление ключевыми словами")
       print(Fore.WHITE + "4.  Просмотр статистики")
-      print(Fore.WHITE + "5.  Быстрая блокировка контента")
       print(Fore.RED + "0.  Выход из программы")
       print()
       
@@ -69,9 +68,6 @@ class UserInterface:
 
       elif choice == "4":
         self.statistics_menu()
-
-      elif choice == "5":
-        self.quick_block_menu()
 
       elif choice == "0":
         print(Fore.YELLOW + " До свидания!")
