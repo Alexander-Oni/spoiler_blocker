@@ -229,3 +229,169 @@ class UserInterface:
       print(Fore.YELLOW + " Категории не найдены")
     
     self.wait_for_enter()
+
+  def keywords_menu(self):
+    """
+    Меню для управления ключевыми словами
+    """
+
+    while True:
+      self.print_header("УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ")
+      
+      print(Fore.WHITE + "1.  Добавить новое ключевое слово")
+      print(Fore.WHITE + "2.  Показать все ключевые слова")
+      print(Fore.WHITE + "3.  Поиск ключевых слов")
+      print(Fore.WHITE + "4.  Удалить ключевое слово")
+      print(Fore.WHITE + "5.  Назад в главное меню")
+      print()
+      
+      choice = input(Fore.GREEN + " Выберите действие (1-5): ")
+      
+      if choice == "1":
+        self.add_keyword()
+
+      elif choice == "2":
+        self.show_all_keywords()
+
+      elif choice == "3":
+        self.search_keywords()
+
+      elif choice == "4":
+        self.delete_keyword()
+
+      elif choice == "5":
+        break
+
+      else:
+        print(Fore.RED + " Неверный выбор!")
+        self.wait_for_enter()
+    
+  def add_keyword(self):
+    """
+    Форма для добавления нового ключевого слова
+    """
+
+    self.print_header("ДОБАВЛЕНИЕ КЛЮЧЕВОГО СЛОВА")
+    
+    # Сначала показываем доступные категории
+    categories = self.db.get_all_categories()
+    if not categories:
+      print(Fore.RED + " Сначала добавьте категории!")
+      self.wait_for_enter()
+      return
+    
+    print(Fore.YELLOW + " Доступные категории:")
+    for category in categories:
+      category_id, category_name, description = category
+      print(f"   {category_id}. {category_name}")
+    print()
+    
+    try:
+      # Получаем данные от пользователя
+      category_id = int(input(" Выберите ID категории: "))
+      keyword_text = input(" Ключевое слово/фраза: ")
+      
+      # Выбор уровня серьезности
+      print("\n Уровень серьезности:")
+      print("1. 🔴 Высокий (критические спойлеры)")
+      print("2. 🟡 Средний (важные детали сюжета)") 
+      print("3. 🟢 Низкий (незначительные спойлеры)")
+      severity_choice = input("Выбор (1-3): ")
+      
+      # Преобразуем выбор в текстовое значение
+      severity_map = {"1": "high", "2": "medium", "3": "low"}
+      severity_level = severity_map.get(severity_choice, "medium")
+      
+      # Проверяем и добавляем ключевое слово
+      if keyword_text and category_id:
+        self.db.add_keyword(keyword_text, category_id, severity_level)
+
+      else:
+        print(Fore.RED + " Все поля должны быть заполнены!")
+
+    except ValueError:
+      print(Fore.RED + " ID категории должен быть числом!")
+    
+    self.wait_for_enter()
+  
+  def show_all_keywords(self):
+    """
+    Показывает все ключевые слова с детальной информацией
+    """
+
+    self.print_header("ВСЕ КЛЮЧЕВЫЕ СЛОВА")
+    
+    keywords = self.db.get_all_keywords()
+    if keywords:
+      print(Fore.GREEN + f" Найдено ключевых слов: {len(keywords)}")
+      print()
+      for keyword in keywords:
+        keyword_id, keyword_text, category_name, severity_level = keyword
+        # Выбираем emoji в зависимости от уровня серьезности
+        severity_icon = "🔴" if severity_level == "high" else "🟡" if severity_level == "medium" else "🟢"
+        print(f"   {keyword_id}. {keyword_text} ({category_name}) {severity_icon}")
+
+    else:
+      print(Fore.YELLOW + "📭 Ключевые слова не найдены")
+    
+    self.wait_for_enter()
+  
+  def search_keywords(self):
+    """
+    Поиск ключевых слов по частичному совпадению
+    """
+
+    self.print_header("ПОИСК КЛЮЧЕВЫХ СЛОВ")
+    
+    search_term = input(" Введите текст для поиска: ")
+    if search_term:
+      results = self.db.search_keywords(search_term)
+
+      if results:
+        print(Fore.GREEN + f" Найдено результатов: {len(results)}")
+        print()
+
+        for keyword_id, keyword_text in results:
+          print(f"   {keyword_id}. {keyword_text}")
+
+      else:
+        print(Fore.YELLOW + " Ничего не найдено")
+
+    else:
+      print(Fore.RED + " Введите текст для поиска!")
+    
+    self.wait_for_enter()
+  
+  def delete_keyword(self):
+    """
+    Удаление ключевого слова из системы
+    """
+
+    self.print_header("УДАЛЕНИЕ КЛЮЧЕВОГО СЛОВА")
+    
+    keywords = self.db.get_all_keywords()
+    if not keywords:
+      print(Fore.YELLOW + " Нет ключевых слов для удаления")
+      self.wait_for_enter()
+      return
+    
+    print(Fore.YELLOW + " Доступные ключевые слова:")
+    for keyword in keywords:
+      keyword_id, keyword_text, category_name, severity_level = keyword
+      print(f"   {keyword_id}. {keyword_text} ({category_name})")
+    print()
+    
+    try:
+      keyword_id = int(input("  Введите ID ключевого слова для удаления: "))
+      confirm = input(" Вы уверены? (y/N): ")
+
+      if confirm.lower() == 'y':
+          self.db.delete_keyword(keyword_id)
+
+      else:
+          print(Fore.YELLOW + " Удаление отменено")
+
+    except ValueError:
+      print(Fore.RED + " ID должен быть числом!")
+    
+    self.wait_for_enter()
