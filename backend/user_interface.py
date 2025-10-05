@@ -161,3 +161,71 @@ class UserInterface:
       print(Fore.YELLOW + "📭 Пользователи не найдены")
     
     self.wait_for_enter()
+
+  def categories_menu(self):
+    """
+    Меню для управления категориями контента
+    """
+
+    while True:
+      self.print_header("УПРАВЛЕНИЕ КАТЕГОРИЯМИ")
+      
+      print(Fore.WHITE + "1.  Добавить новую категорию")
+      print(Fore.WHITE + "2.  Показать все категории")
+      print(Fore.WHITE + "3.  Назад в главное меню")
+      print()
+      
+      choice = input(Fore.GREEN + " Выберите действие (1-3): ")
+      
+      if choice == "1":
+        self.add_category()
+
+      elif choice == "2":
+        self.show_all_categories()
+
+      elif choice == "3":
+        break
+
+      else:
+        print(Fore.RED + " Неверный выбор!")
+        self.wait_for_enter()
+  
+  def add_category(self):
+    """
+    Форма для добавления новой категории
+    """
+
+    self.print_header("ДОБАВЛЕНИЕ КАТЕГОРИИ")
+    
+    print(Fore.YELLOW + " Введите данные новой категории:")
+    category_name = input(" Название категории: ")
+    description = input(" Описание: ")
+    
+    if category_name:
+      self.db.add_category(category_name, description)
+
+    else:
+      print(Fore.RED + " Название категории обязательно!")
+    
+    self.wait_for_enter()
+  
+  def show_all_categories(self):
+    """
+    Показывает все категории контента
+    """
+
+    self.print_header("СПИСОК КАТЕГОРИЙ")
+    
+    categories = self.db.get_all_categories()
+    if categories:
+      print(Fore.GREEN + f" Найдено категорий: {len(categories)}")
+      print()
+
+      for category in categories:
+        category_id, category_name, description = category
+        print(f"   {category_id}. {category_name} - {description}")
+
+    else:
+      print(Fore.YELLOW + " Категории не найдены")
+    
+    self.wait_for_enter()
