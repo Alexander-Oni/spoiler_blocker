@@ -9,9 +9,16 @@ SPOILER BLOCKER - Система блокировки спойлеров
 """
 
 # Импортируем необходимые модули
-from db_manager import DatabaseManager
-from user_interface import UserInterface
-from colorama import Fore, Style, init
+try:
+  from db_manager import DatabaseManager
+  from user_interface import UserInterface
+  from colorama import Fore, Style, init
+
+except ImportError as e:
+  print(f"Ошибка импорта: {e}")
+  print("Убедитесь, что установлены все зависимости:")
+  print("pip install -r requirements.txt")
+  sys.exit(1)
 import sys
 
 # Инициализируем библиотеку для цветного вывода
@@ -39,13 +46,14 @@ def main():
   database = input("База данных (spoiler_blocker): ") or "spoiler_blocker"
   user = input("Пользователь (postgres): ") or "postgres"
   password = input("Пароль: ") or "postgres"
+  port = input("Порт (5432): ") or "5432"
 
   print()
   print(Fore.YELLOW + "Подключаемся к базе данных...")
 
   try:
     # Создаем менеджер базы данных
-    db_manager = DatabaseManager(host, database, user, password)
+    db_manager = DatabaseManager(host, database, user, password, int(port))
     
     # Проверяем подключение
     if not db_manager.connect():
