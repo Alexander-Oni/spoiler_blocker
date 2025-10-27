@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 from db_manager import DatabaseManager
 from flask_cors import CORS  # Для разрешения запросов из браузера
 import logging
+import json
 
 # Настройка логирования для отладки
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +25,23 @@ db = DatabaseManager(
   password='postgres'  
 )
 
+@app.before_request
+def handle_preflight():
+  if request.method == "OPTIONS":
+    response = jsonify({"status": "success"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
+
+@app.after_request
+def after_request(response):
+  response.headers.add('Access-Control-Allow-Origin', '*')
+  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept')
+  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+  response.headers.add('Access-Control-Allow-Credentials', 'true')
+  return response
+
 @app.route('/')
 def home():
   """Главная страница API сервера"""
@@ -37,12 +55,14 @@ def home():
     }
   })
 
-@app.route('/api/keywords', methods=['GET'])
+@app.route('/api/keywords', methods=['GET', 'OPTIONS'])
 def get_keywords():
   """
   API ЭНДПОИНТ: Получить все ключевые слова для расширения
   Вызывается при загрузке каждой страницы в браузере
   """
+  if request.method == 'OPTIONS':
+    return '', 200
 
   try:
     logger.info("Получен запрос на получение ключевых слов")
@@ -63,11 +83,14 @@ def get_keywords():
     
     logger.info(f"Отправлено {len(keywords_list)} ключевых слов")
     
-    return jsonify({
+    response = jsonify({
       'success': True,
       'keywords': keywords_list,
       'count': len(keywords_list)
     })
+
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
   
   except Exception as e:
     logger.error(f"Ошибка в /api/keywords: {e}")
@@ -76,17 +99,34 @@ def get_keywords():
       'error': str(e)
     }), 500
   
-@app.route('/api/block', methods=['POST'])
+@app.route('/api/block', methods=['POST', 'OPTIONS'])
 def log_block():
   """
   API ЭНДПОИНТ: Записать факт блокировки спойлера
   Вызывается когда расширение блокирует спойлер на странице
   """
 
+  if request.method == 'OPTIONS':
+    return '', 200
+
   try:
     # Получаем JSON данные из запроса
     data = request.json
     logger.info(f"Получены данные блокировки: {data}")
+
+    if not data:
+      return jsonify({'success': False, 'error': 'No JSON data provided'}), 400
+    
+    keyword_text = data.get('keyword_text', '')
+    
+    if not keyword_text:
+      return jsonify({'success': False, 'error': 'keyword_text is required'}), 400
+    
+    keyword_id = db.find_keyword_id_by_text(keyword_text)
+    
+    if not keyword_id:
+      logger.warning(f"Ключевое слово не найдено: '{keyword_text}'")
+      return jsonify({'success': False, 'error': 'Keyword not found'}), 404
     
     # Логируем блокировку в базу данных
     success = db.log_blocked_content(
@@ -111,13 +151,16 @@ def log_block():
       'error': str(e)
     }), 500
   
-@app.route('/api/stats', methods=['GET'])
+@app.route('/api/stats', methods=['GET', 'OPTIONS'])
 def get_stats():
   """
   API ЭНДПОИНТ: Получить статистику блокировок
   Используется во всплывающем окне расширения
   """
 
+  if request.method == 'OPTIONS':
+    return '', 200
+  
   try:
     # Получаем user_id из параметров запроса
     user_id = request.args.get('user_id', 1, type=int)
