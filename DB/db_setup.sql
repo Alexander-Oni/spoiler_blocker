@@ -1,6 +1,6 @@
 CREATE DATABASE spoiler_blocker;
 
-\c spoiler_blocker;
+\connect spoiler_blocker;
 
 CREATE TABLE Users (
   user_id SERIAL PRIMARY KEY,
@@ -8,14 +8,14 @@ CREATE TABLE Users (
   email VARCHAR(100) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   subscription_type VARCHAR(20) DEFAULT 'free'
-)
+);
 
 CREATE TABLE Categories (
   category_id SERIAL PRIMARY KEY,
   category_name VARCHAR(100) NOT NULL,
   description TEXT,
   is_active BOOLEAN DEFAULT TRUE
-)
+);
 
 CREATE TABLE Keywords (
   keyword_id SERIAL PRIMARY KEY,
@@ -23,7 +23,7 @@ CREATE TABLE Keywords (
   category_id INTEGER REFERENCES Categories(category_id),
   severity_level VARCHAR(20) DEFAULT 'medium',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 CREATE TABLE User_Filters (
   filter_id SERIAL PRIMARY KEY,
@@ -31,7 +31,7 @@ CREATE TABLE User_Filters (
   keyword_id INTEGER REFERENCES Keywords(keyword_id),
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 CREATE TABLE Blocked_Content_Log (
   log_id SERIAL PRIMARY KEY,
@@ -40,7 +40,7 @@ CREATE TABLE Blocked_Content_Log (
   url VARCHAR(500),
   blocked_content TEXT,
   blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 -- Начальные данные для тестирования
 INSERT INTO Categories (category_name, description) VALUES
