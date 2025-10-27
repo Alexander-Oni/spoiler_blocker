@@ -19,7 +19,7 @@ class DatabaseManager:
     self.user = user
     self.password = password
     self.port = port
-    self.connect()
+    self.is_connected=self.connect()
 
   def _ensure_connection(self):
     """Проверяет активность соединения с БД"""
