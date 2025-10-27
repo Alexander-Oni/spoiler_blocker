@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Spoiler Blocker</title>
+    <link rel="stylesheet" href="css/popup_styles.css" />
+  </head>
+  <body>
+    <div class="header">
+      <h3>&#128683; SpoilerBlocker</h3>
+      <p>Защита от спойлеров</p>
+    </div>
+
+    <div class="status">
+      <p>&#9989; <strong>Защита активна</strong></p>
+      <p>&#128269; Мониторинг страницы</p>
+    </div>
+
+    <div class="stats">
+      <p><strong>Статистика:</strong></p>
+      <p>• Заблокировано: <span id="blockedCount">0</span></p>
+      <p>• Активных фильтров: <span id="filterCount">0</span></p>
+      <p>• Последняя блокировка: <span id="lastBlocked">никогда</span></p>
+    </div>
+
+    <button id="settingsBtn">&#9881; Настройки</button>
+    <button id="pauseBtn">&#x23F8;&#xFE0F; Приостановить</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
