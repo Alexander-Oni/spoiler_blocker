@@ -56,3 +56,40 @@ async function sendBlockLogToServer(keywordText, blockedContent) {
     console.error("Ошибка отправки лога на сервер:", error);
   }
 }
+
+function blockSpoilers() {
+  if (SPOILER_KEYWORDS.length === 0) {
+    console.log("Ключевые слова еще не загружены с сервера...");
+    return;
+  }
+
+  let blockedCount = 0;
+
+  SPOILER_KEYWORDS.forEach((spoiler) => {
+    const regex = new RegExp(spoiler, "gi");
+    const elements = document.body.getElementsByTagName("*");
+
+    for (let element of elements) {
+      for (let node of element.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const originalText = node.textContent;
+
+          if (regex.test(originalText)) {
+            const blockedText = originalText.replace(
+              regex,
+              "[СПОЙЛЕР ЗАБЛОКИРОВАН]"
+            );
+            node.textContent = blockedText;
+            blockedCount++;
+
+            sendBlockLogToServer(spoiler, originalText);
+          }
+        }
+      }
+    }
+  });
+
+  if (blockedCount > 0) {
+    console.log(`SpoilerBlocker заблокировал ${blockedCount} спойлеров`);
+  }
+}
