@@ -9,7 +9,7 @@ init(autoreset=True)
 class DatabaseManager:
 
   def __init__(self, host='localhost', database='spoiler_blocker', 
-                user='postgres', password='postgres'):
+              user='postgres', password='postgres', port=5432):
     """
     Конструктор класса - инициализирует подключение к базе данных
     """
@@ -18,7 +18,8 @@ class DatabaseManager:
     self.database = database
     self.user = user
     self.password = password
-    self.is_connected = self.connect()
+    self.port = port
+    self.connect()
 
   def _ensure_connection(self):
     """Проверяет активность соединения с БД"""
@@ -37,11 +38,11 @@ class DatabaseManager:
 
     try:
       self.connection = psycopg2.connect(
-          host=self.host,
-          database=self.database,
-          user=self.user,
-          password=self.password,
-          port=5432
+        host=self.host,
+        database=self.database,
+        user=self.user,
+        password=self.password,
+        port=self.port
       )
       print(Fore.GREEN + "Успешное подключение к PostgreSQL")
       return True
@@ -305,6 +306,28 @@ class DatabaseManager:
         self.connection.rollback()
       print(Fore.RED + f"Ошибка удаления: {e}")
       return False
+    
+  def find_keyword_id_by_text(self, keyword_text):
+    """Поиск ID ключевого слова по тексту"""
+
+    try:
+      with self.connection.cursor() as cursor:
+        query = "SELECT keyword_id FROM Keywords WHERE keyword_text = %s"
+        cursor.execute(query, (keyword_text,))
+        result = cursor.fetchone()
+          
+        if result:
+          keyword_id = result[0]
+          print(f"[OK] Найден keyword_id {keyword_id} для '{keyword_text}'")
+          return keyword_id
+        
+        else:
+          print(f"[WARN] Ключевое слово '{keyword_text}' не найдено в базе")
+          return None
+      
+    except Error as e:
+        print(Fore.RED + f"[ERROR] Ошибка поиска keyword_id: {e}")
+        return None
     
   def log_blocked_content(self, user_id, keyword_id, url, blocked_content):
     """
