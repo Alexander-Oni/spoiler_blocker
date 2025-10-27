@@ -28,3 +28,31 @@ async function loadKeywordsFromServer() {
     SPOILER_KEYWORDS = ["спойлер", "финал", "смерть персонажа", "развязка"];
   }
 }
+
+async function sendBlockLogToServer(keywordText, blockedContent) {
+  try {
+    console.log(`Отправляю лог блокировки: "${keywordText}"`);
+
+    const logData = {
+      user_id: USER_ID,
+      keyword_text: keywordText,
+      url: window.location.href,
+      content: blockedContent.substring(0, 100),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/block`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(logData),
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const result = await response.json();
+    if (result.success) {
+      console.log("Лог блокировки успешно отправлен на сервер");
+    }
+  } catch (error) {
+    console.error("Ошибка отправки лога на сервер:", error);
+  }
+}
