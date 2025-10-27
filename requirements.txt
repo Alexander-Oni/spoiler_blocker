@@ -1,2 +1,4 @@
 psycopg2-binary==2.9.7
 colorama==0.4.6
+flask==2.3.3
+flask-cors==4.0.0
