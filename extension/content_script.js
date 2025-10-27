@@ -93,3 +93,30 @@ function blockSpoilers() {
     console.log(`SpoilerBlocker заблокировал ${blockedCount} спойлеров`);
   }
 }
+
+async function initializeExtension() {
+  console.log("Инициализация SpoilerBlocker...");
+
+  await loadKeywordsFromServer();
+  blockSpoilers();
+
+  setInterval(blockSpoilers, 3000);
+
+  console.log("SpoilerBlocker успешно инициализирован и работает!");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeExtension);
+} else {
+  initializeExtension();
+}
+
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.addedNodes.length) {
+      setTimeout(blockSpoilers, 100);
+    }
+  });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
