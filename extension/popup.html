@@ -8,23 +8,35 @@
   <body>
     <div class="header">
       <h3>&#128683; SpoilerBlocker</h3>
-      <p>Защита от спойлеров</p>
+      <p>Защита от&nbsp;спойлеров в&nbsp;реальном времени</p>
     </div>
 
     <div class="status">
-      <p>&#9989; <strong>Защита активна</strong></p>
-      <p>&#128269; Мониторинг страницы</p>
+      <p>
+        <span class="active-indicator"></span><strong>Защита активна</strong>
+      </p>
+      <p>Мониторинг страницы включен</p>
     </div>
 
     <div class="stats">
-      <p><strong>Статистика:</strong></p>
-      <p>• Заблокировано: <span id="blockedCount">0</span></p>
-      <p>• Активных фильтров: <span id="filterCount">0</span></p>
-      <p>• Последняя блокировка: <span id="lastBlocked">никогда</span></p>
+      <p><strong>📊 Статистика блокировок:</strong></p>
+      <div class="stat-item">
+        <span>Заблокировано:</span>
+        <span class="stat-value" id="blockedCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span>Активных фильтров:</span>
+        <span class="stat-value" id="filterCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span>Последняя блокировка:</span>
+        <span class="stat-value" id="lastBlocked">никогда</span>
+      </div>
     </div>
 
-    <button id="settingsBtn">&#9881; Настройки</button>
-    <button id="pauseBtn">&#x23F8;&#xFE0F; Приостановить</button>
+    <button id="settingsBtn">⚙️ Настройки фильтров</button>
+    <button id="pauseBtn">⏸️ Приостановить защиту</button>
+    <button id="refreshBtn">🔄 Обновить статистику</button>
 
     <script src="popup.js"></script>
   </body>
