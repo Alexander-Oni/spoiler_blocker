@@ -82,14 +82,12 @@ async function sendBlockLogToServer(keywordText, blockedContent) {
       content: blockedContent.substring(0, 200),
     };
 
-    console.log("📨 Данные для отправки:", logData);
+    console.log("Данные для отправки:", logData);
 
-    // УЛУЧШЕННАЯ ОТПРАВКА С ОБРАБОТКОЙ ОШИБОК
     const response = await fetch(`${API_BASE_URL}/api/block`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
       },
       body: JSON.stringify(logData),
     });
@@ -98,6 +96,15 @@ async function sendBlockLogToServer(keywordText, blockedContent) {
 
     if (!response.ok) {
       const errorText = await response.text();
+
+      // Если ключевое слово не найдено, добавляем его автоматически
+      if (response.status === 404 && errorText.includes("Keyword not found")) {
+        console.log(
+          `Ключевое слово "${keywordText}" не найдено в базе. Можно добавить автоматически.`
+        );
+        // Здесь можно добавить логику для автоматического добавления ключевого слова
+      }
+
       throw new Error(
         `HTTP error! status: ${response.status}, response: ${errorText}`
       );
@@ -107,25 +114,26 @@ async function sendBlockLogToServer(keywordText, blockedContent) {
     console.log("Ответ сервера:", result);
 
     if (result.success) {
-      console.log("Лог блокировки успешно записан в базу данных");
+      console.log("✅ Лог блокировки успешно записан в базу данных");
 
-      // 🆕 ОБНОВЛЯЕМ POPUP ЧЕРЕЗ BACKGROUND SCRIPT
+      // Обновляем статистику в popup
       chrome.runtime.sendMessage({ action: "blockedContent" });
     } else {
-      console.error("Ошибка на сервере:", result.error);
+      console.error("❌ Ошибка на сервере:", result.error);
     }
   } catch (error) {
-    console.error("Ошибка отправки лога на сервер:", error);
+    console.error("❌ Ошибка отправки лога на сервер:", error);
 
-    // ДЕТАЛЬНАЯ ДИАГНОСТИКА ОШИБКИ
     if (error.message.includes("Failed to fetch")) {
-      console.error("Проблема с сетью или CORS. Проверьте:");
-      console.error("Запущен ли API сервер на localhost:5000");
-      console.error("CORS настройки сервера");
+      console.error("🔧 Проблема с сетью или CORS. Проверьте:");
+      console.error("   - Запущен ли API сервер на localhost:5000");
     } else if (error.message.includes("404")) {
-      console.error("Endpoint не найден. Проверьте URL API");
+      console.error("🔍 Ключевое слово не найдено в базе данных");
+      console.error(
+        "   - Запустите скрипт add_test_keywords.py для добавления тестовых данных"
+      );
     } else if (error.message.includes("500")) {
-      console.error("Ошибка сервера. Проверьте логи API");
+      console.error("💾 Ошибка сервера. Проверьте логи API");
     }
   }
 }
@@ -146,24 +154,57 @@ function blockSpoilers() {
   );
 
   elements.forEach((element) => {
-    SPOILER_KEYWORDS.forEach((spoiler) => {
-      try {
-        const originalHTML = element.innerHTML;
-        const regex = new RegExp(spoiler, "gi");
+    // Пропускаем элементы, которые уже были обработаны
+    if (element.classList.contains("spoiler-blocker-processed")) {
+      return;
+    }
 
-        if (regex.test(originalHTML)) {
-          const newHTML = originalHTML.replace(
-            regex,
-            '<span style="background: #ffeb3b; color: #000; padding: 2px 4px; border-radius: 3px;">[СПОЙЛЕР ЗАБЛОКИРОВАН]</span>'
-          );
-          element.innerHTML = newHTML;
-          blockedCount++;
+    // Помечаем элемент как обработанный
+    element.classList.add("spoiler-blocker-processed");
 
-          console.log(`Заблокирован: "${spoiler}"`);
-          sendBlockLogToServer(spoiler, originalHTML.substring(0, 200));
+    // Работаем с текстовыми узлами внутри элемента
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+
+    const textNodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      textNodes.push(node);
+    }
+
+    textNodes.forEach((textNode) => {
+      const originalText = textNode.textContent;
+      let modifiedText = originalText;
+
+      SPOILER_KEYWORDS.forEach((spoiler) => {
+        try {
+          const regex = new RegExp(spoiler, "gi");
+          if (regex.test(modifiedText)) {
+            modifiedText = modifiedText.replace(
+              regex,
+              " [СПОЙЛЕР ЗАБЛОКИРОВАН] "
+            );
+            blockedCount++;
+            console.log(`Заблокирован: "${spoiler}"`);
+            sendBlockLogToServer(spoiler, originalText.substring(0, 200));
+          }
+        } catch (error) {
+          console.error(`Ошибка при обработке слова "${spoiler}":`, error);
         }
-      } catch (error) {
-        console.error(`Ошибка при обработке слова "${spoiler}":`, error);
+      });
+
+      // Заменяем текстовый узел только если были изменения
+      if (modifiedText !== originalText) {
+        const newSpan = document.createElement("span");
+        newSpan.innerHTML = modifiedText.replace(
+          /\[СПОЙЛЕР ЗАБЛОКИРОВАН\]/g,
+          '<span style="background: #ffeb3b; color: #000; padding: 2px 4px; border-radius: 3px; font-weight: bold;">[СПОЙЛЕР ЗАБЛОКИРОВАН]</span>'
+        );
+        textNode.parentNode.replaceChild(newSpan, textNode);
       }
     });
   });
