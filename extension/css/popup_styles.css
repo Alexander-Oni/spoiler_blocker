@@ -1,32 +1,93 @@
 body {
-  width: 300px;
+  width: 320px;
   padding: 15px;
-  font-family: Arial;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  margin: 0;
 }
 
 .header {
   text-align: center;
-  color: #4caf50;
+  margin-bottom: 15px;
+}
+
+.header h3 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+}
+
+.header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 12px;
 }
 
 .status {
-  background: #e8f5e8;
-  padding: 10px;
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
   margin-bottom: 10px;
+  backdrop-filter: blur(10px);
 }
 
 .stats {
-  background: #f0f0f0;
-  padding: 8px;
-  border-radius: 5px;
-  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
   font-size: 12px;
+  backdrop-filter: blur(10px);
 }
 
 button {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+  padding: 10px;
+  margin-top: 8px;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 3px 0;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.active-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
