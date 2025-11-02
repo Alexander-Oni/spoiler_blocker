@@ -47,10 +47,10 @@ python.exe -m pip install --upgrade pip
 # установка зависимостей
 pip install -r requirements.txt
 
-# установите соединение с бд и запустите административный интерфейс
+# установите соединение с бд и запустите административный интерфейс в окне powershell
 python spoiler_blocker.py
 
-# запустите сервер
+# запустите сервер во втором окне powershell
 python api_server.py
 
 ```
