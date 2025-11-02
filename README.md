@@ -25,6 +25,9 @@ This is my course project on the basics of programming. Spoiler Blocker
 ### 1. Установка базы данных
 
 ```bash
+# клонируйте репозиторий
+git clone git@github.com:Alexander-Oni/spoiler_blocker.git
+
 # Создание базы данных
 createdb spoiler_blocker
 
@@ -34,3 +37,50 @@ psql -U postgres -c "CREATE DATABASE spoiler_blocker;"
 ```
 
 Далее нажмите на Restore и выберите файл db_setup.sql
+
+### 2. Настройка бэкэнда
+
+```bash
+# установка зависимостей
+pip install -r requirements.txt
+
+# установите соединение с бд и запустите административный интерфейс
+python spoiler_blocker.py
+
+# запустите сервер
+python api_server.py
+
+```
+
+### 3. Установка расширения
+
+1. Откройте chrome://extensions/
+
+2. Включите "Режим разработчика"
+
+3. Нажмите "Загрузить распакованное расширение"
+
+4. Выберите папку extension
+
+### 4. Приложение готово к работе
+
+### Структура приложения
+
+SpoilerBlocker/
+├── 📁 backend/ # Python бэкенд
+│ ├── api_server.py # API сервер
+│ ├── database_manager.py # Управление БД
+│ ├── spoiler_blocker.py # Основное приложение
+│ ├── user_interface.py # CLI интерфейс
+│ ├── requirements.txt # Зависимости Python
+├── 🌐 extension/ # Браузерное расширение
+│ ├── manifest.json # Конфигурация
+│ ├── content_script.js # Скрипт для страниц
+│ ├── popup.html # Интерфейс расширения
+| ├── css
+│ │ └──popup_styles.css
+│ ├── popup.js # Логика popup
+│ ├── background.js # Фоновый скрипт
+│ └── 📁 images/ # Иконки расширения
+└── 🗄️ db/ # База данных
+└── setup_database.sql # SQL скрипты
