@@ -24,23 +24,26 @@ This is my course project on the basics of programming. Spoiler Blocker
 
 ### 1. Установка базы данных
 
+1.1
+
 ```bash
 # клонируйте репозиторий
 git clone git@github.com:Alexander-Oni/spoiler_blocker.git
 
-# Создание базы данных
-createdb spoiler_blocker
-
-# Или через psql
-psql -U postgres -c "CREATE DATABASE spoiler_blocker;"
-
 ```
 
-Далее нажмите на Restore и выберите файл db_setup.sql
+1.2
+ЗАйдите в pgAdmin4 и создайте базу данных spoiler_blocker
+
+1.3
+Зайдите в QueryTool в созданной бд и вставьте туда код из db_setup.sql
 
 ### 2. Настройка бэкэнда
 
 ```bash
+# На всякий случай оновите интерпритатор
+python.exe -m pip install --upgrade pip
+
 # установка зависимостей
 pip install -r requirements.txt
 
