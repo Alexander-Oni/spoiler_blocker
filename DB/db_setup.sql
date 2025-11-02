@@ -1,7 +1,3 @@
-CREATE DATABASE spoiler_blocker;
-
-\connect spoiler_blocker;
-
 CREATE TABLE Users (
   user_id SERIAL PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
@@ -58,5 +54,5 @@ INSERT INTO Users (username, email, subscription_type) VALUES
 ('test_user', 'test@example.com', 'free'),
 ('admin', 'admin@example.com', 'premium');
 
-SELECT 'База данных SpoilerShield создана успешно!' as status;
+SELECT 'База данных SpoilerBlocker создана успешно!' as status;
         
